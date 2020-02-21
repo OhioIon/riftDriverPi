@@ -3,10 +3,14 @@ Small USB HID driver to activate Oculus Rift CV1 connected to Raspberry Pi 4
 
 <b>How to compile the driver</b>
 - Start RPi 4 and open a terminal
-- sudo apt-get install libusb-1.0
-- git clone --recurse-submodules https://github.com/OhioIon/riftDriverPi
-- cd riftDriverPi
-- make 
+- Execute the following commands
+
+```shell
+sudo apt-get install libusb-1.0
+git clone --recurse-submodules https://github.com/OhioIon/riftDriverPi
+cd riftDriverPi
+make
+```
 
 <b>How to make Raspbian recognize the Oculus Rift CV1 as screen</b>
 - Connect your normal screen to HDMI0

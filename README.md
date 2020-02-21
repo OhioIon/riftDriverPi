@@ -19,8 +19,8 @@ Step 1 - Hardware connection
 - Connect the Oculus Rift CV1 to HDMI1 and USB 3.0 port of the RPi 4
 
 Step 2 - Rebuilding the kernel with increased framerate support
-- The RPi kernel currently has a limitation of 85 Hz refresh rate for displays
-- The Oculus Rift CV1 requires exactly 90 Hz refresh rate
+- The RPi kernel currently has a limitation of 85 Hz framerate for displays
+- The Oculus Rift CV1 requires exactly 90 Hz framerate
 - In order to get and build the kernel execute the following commands in a terminal
 - This follows the instructions of https://www.raspberrypi.org/documentation/linux/kernel/building.md
 
@@ -40,6 +40,7 @@ sudo cp arch/arm/boot/dts/*.dtb /boot/
 sudo cp arch/arm/boot/dts/overlays/*.dtb* /boot/overlays/
 sudo cp arch/arm/boot/dts/overlays/README /boot/overlays/
 sudo cp arch/arm/boot/zImage /boot/$KERNEL.img
+sudo reboot
 ```
 
 - ... TODO /boot/config.txt changes  

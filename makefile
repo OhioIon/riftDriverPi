@@ -25,7 +25,7 @@ clean:
 	-@echo ' '
 
 %.o: %.c
-	gcc -I/usr/include/libusb-1.0 -O0 -g3 -Wall -c -fmessage-length=0 `pkg-config libusb-1.0 --cflags` -fPIC -pthread -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	gcc -I./hidapi/hidapi -I/usr/include/libusb-1.0 -O0 -g3 -Wall -c -fmessage-length=0 `pkg-config libusb-1.0 --cflags` -fPIC -pthread -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo ' '
 
 .PHONY: all clean dependents

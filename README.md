@@ -42,5 +42,38 @@ sudo cp arch/arm/boot/dts/overlays/README /boot/overlays/
 sudo cp arch/arm/boot/zImage /boot/$KERNEL.img
 sudo reboot
 ```
+Step 3 - Configure screen resolution manually via RPi config.txt
+- The Rift CV1 does not function like a normal screen
+- It will only send hotplug over HDMI if it is enabled via a USB driver (which is too late for RPi)
+- Also the EDID does not contain a standard timing information but only a single detailed timing descriptor
+- In order to make it work, we need to explicitly apply the detailed timing spec in config.txt and force the hotplug
+- The following lines need to be set in /boot/config.txt
 
-- ... TODO /boot/config.txt changes  
+```shell
+hdmi_force_hotplug:1=1
+hdmi_group:1=2
+hdmi_mode:1=87
+hdmi_timings:1=2160 1  8  32  40 1200 0  50 2 220 0 0 0 90 0 296750000 3
+```
+You can also use the config.txt provided as reference and copy it with:
+
+```shell
+sudo cp ~/riftDriverPi/config.txt /boot
+sudo reboot
+```
+
+Now there is a second screen in the RPi 4 Screen Layout Editor (Preferences -> Screen Configuration) with resolution "FIXEDMODE".
+
+<b>How to enable the Oculus Rift CV1 screen</b>
+- Just execute the riftDriverPi
+
+```shell
+cd ~/riftDriverPi
+./riftDriverPi
+```
+- You should see that the orange LED on the Rift turns white
+- You should see the extended desktop through the Rift
+- Test it and watch a side-by-side video in full-screen on YouTube
+  (https://www.youtube.com/results?search_query=3D+side+by+side)
+
+

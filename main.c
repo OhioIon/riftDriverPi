@@ -32,7 +32,7 @@ int msleep(long msec)
   ts.tv_sec = msec / 1000;
   ts.tv_nsec = (msec % 1000) * 1000000;
 
-  do 
+  do
   {
     res = nanosleep(&ts, &ts);
   } while (res);
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   int res;
   wchar_t wstr[MAX_STR];
   hid_device *handle;
-  
+
   wprintf(L"/// riftDriverPi ///\n");
 
   // Initialize hidapi library
@@ -86,24 +86,27 @@ int main(int argc, char* argv[])
   res = hid_get_serial_number_string(handle, wstr, MAX_STR);
   if( res < 0 ) goto cleanup;
   wprintf(L"Serial Number : %S\n", wstr);
-  
+
   // Set non-blocking
   res = hid_set_nonblocking(handle, 1);
   if( res < 0 ) goto cleanup;
   wprintf(L"Configured non-blocking transfer\n");
-  
+
   // Turn the CV1 screens on
-  res = rift_send_enable_components(handle);
+  res = rift_send_enable_components(handle,1);
   if( res != 0 ) goto cleanup;
   wprintf(L"Screen enabled\n");
 
-  // Send keep alive every 8 seconds (timeout is 10 seconds)
+  // Send keep alive
   while(!kbhit())
   {
     res = rift_send_keep_alive(handle);
     if( res < 0 ) goto cleanup;
-    msleep( 8000 );
+    msleep( 100 );
   }
+
+  // Turn the CV1 screen off
+  rift_send_enable_components(handle, 0);
 
 cleanup:
   // Close down connection
@@ -112,7 +115,7 @@ cleanup:
   // Finalize the hidapi library
 abort:
   hid_exit();
-  
+
   wprintf(L"/// Exit ///\n");
 
   return 0;

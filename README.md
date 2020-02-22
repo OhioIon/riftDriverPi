@@ -64,16 +64,25 @@ sudo reboot
 
 Now there is a second screen in the RPi 4 Screen Layout Editor (Preferences -> Screen Configuration) with resolution "FIXEDMODE".
 
-<b>How to enable the Oculus Rift CV1 screen</b>
-- Just execute the riftDriverPi
+<b>Configure linux to use hidapi via libusb for Oculus Rift</b>
+- Execute the following commands in a terminal
+```shell
+echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="2833", MODE="0666", GROUP="plugdev"' | sudo tee --append /etc/udev/rules.d/83-hmd.rules
+sudo udevadm control --reload-rules
+sudo reboot
+```
+
+<b>Enable the Oculus Rift CV1 screen</b>
+- If the previous configuration steps have been completed, there is no need to repeat them
+- In order to activate the Oculus Rift CV1 screen, just execute the riftDriverPi app
+- The driver will enable the screen and send the keep-alive message cyclically
 
 ```shell
-cd ~/riftDriverPi
-./riftDriverPi
+~/riftDriverPi/riftDriverPi
 ```
 - You should see that the orange LED on the Rift turns white
-- You should see the extended desktop through the Rift
-- Test it and watch a side-by-side video in full-screen on YouTube
+- You should see the extended desktop through the Rift (but not nice since left and right eye see different parts)
+- Test stereo view by watching a side-by-side video in full-screen on YouTube
   (https://www.youtube.com/results?search_query=3D+side+by+side)
 
-
+Hint: In order to disable the screen, stop the driver by pressing any key on the keyboard

@@ -1,5 +1,5 @@
 # riftDriverPi
-Small USB HID driver to activate Oculus Rift CV1 connected to Raspberry Pi 4
+Small USB HID driver to activate Oculus Rift CV1 as extended display on Raspberry Pi 4
 
 <b>How to compile the driver</b>
 - Start RPi 4 and open a terminal

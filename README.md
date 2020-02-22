@@ -85,4 +85,4 @@ sudo reboot
 - Test stereo view by watching a side-by-side video in full-screen on YouTube
   (https://www.youtube.com/results?search_query=3D+side+by+side)
 
-Hint: In order to disable the screen, stop the driver by pressing any key on the keyboard
+Hint: In order to disable the screen, stop the driver by pressing the return key on the keyboard

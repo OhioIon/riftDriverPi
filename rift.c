@@ -49,7 +49,7 @@ uint8_t rift_send_enable_components( hid_device *handle, uint8_t on_u8 )
   {
     // Error
     wprintf(L"Sending component enable failed with %d\n", res);
-    return 1;
+    return res;
   }
 
   return 0;

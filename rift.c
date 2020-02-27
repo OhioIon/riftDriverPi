@@ -28,7 +28,7 @@ uint8_t rift_send_keep_alive( hid_device *handle )
   {
     // Error
     wprintf(L"Sending keep alive failed with %d\n", res);
-    return 1;
+    return res;
   }
 
   return 0;

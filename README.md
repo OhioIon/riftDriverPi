@@ -65,7 +65,9 @@ sudo reboot
 Now there is a second screen in the RPi 4 Screen Layout Editor (Preferences -> Screen Configuration) with resolution "FIXEDMODE".
 
 <b>Configure linux to use hidapi via libusb for Oculus Rift</b>
+- This will avoid having to run the application as root to access the USB device
 - Execute the following commands in a terminal
+
 ```shell
 echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="2833", MODE="0666", GROUP="plugdev"' | sudo tee --append /etc/udev/rules.d/83-hmd.rules
 sudo udevadm control --reload-rules
@@ -85,4 +87,4 @@ sudo reboot
 - Test stereo view by watching a side-by-side video in full-screen on YouTube
   (https://www.youtube.com/results?search_query=3D+side+by+side)
 
-Hint: In order to disable the screen, stop the driver by pressing the return key on the keyboard
+Hint: Hitting return in the terminal will stop the application.

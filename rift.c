@@ -11,7 +11,7 @@
 
 // ********************* Implementation ********************* //
 
-uint8_t rift_send_keep_alive( hid_device *handle )
+int16_t rift_send_keep_alive( hid_device *handle )
 {
   // Prepare buffer
   uint8_t buf_au8[5];
@@ -23,18 +23,18 @@ uint8_t rift_send_keep_alive( hid_device *handle )
   buf_au8[4] = tiKeepAlive_ms_cu16 >> 8;   // Keep alive interval
 
   // Send feature report
-  int res = hid_send_feature_report(handle, buf_au8, sizeof(buf_au8) );
-  if( res < 0 )
+  int16_t res_s16 = hid_send_feature_report(handle, buf_au8, sizeof(buf_au8) );
+  if( res_s16 < 0 )
   {
     // Error
-    wprintf(L"Sending keep alive failed with %d\n", res);
-    return res;
+    wprintf(L"Sending keep alive failed with %d\n", res_s16);
+    return res_s16;
   }
 
   return 0;
 }
 
-uint8_t rift_send_enable_components( hid_device *handle, uint8_t on_u8 )
+int16_t rift_send_enable_components( hid_device *handle, uint8_t on_u8 )
 {
   // Prepare buffer
   uint8_t buf_au8[4];
@@ -44,12 +44,12 @@ uint8_t rift_send_enable_components( hid_device *handle, uint8_t on_u8 )
   buf_au8[3] = (on_u8 != 0)? 0x01 : 0x00; // Flags: 1 = Display, 2 = Audio, 4 = LEDs
 
   // Send feature report
-  int res = hid_send_feature_report(handle, buf_au8, sizeof(buf_au8) );
-  if( res < 0 )
+  int16_t res_s16 = hid_send_feature_report(handle, buf_au8, sizeof(buf_au8) );
+  if( res_s16 < 0 )
   {
     // Error
-    wprintf(L"Sending component enable failed with %d\n", res);
-    return res;
+    wprintf(L"Sending component enable failed with %d\n", res_s16);
+    return res_s16;
   }
 
   return 0;

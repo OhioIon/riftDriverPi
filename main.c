@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   wchar_t wstr[MAX_STR];
   hid_device *handle;
 
-  wprintf(L"/// riftDriverPi ///\n");
+  wprintf(L"/// riftDriverPi V1.1 ///\n");
 
   // Initialize hidapi library
   hid_init();
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   handle = hid_open(0x2833, 0x0031, NULL);
   if( handle == NULL )
   {
-    wprintf(L"hid_open() failed\n");
+    wprintf(L"hid_open() failed. Oculus Rift CV1 connected? udev rule setup?\n");
     goto abort;
   }
 
@@ -94,19 +94,21 @@ int main(int argc, char* argv[])
 
   // Turn the CV1 screens on
   res = rift_send_enable_components(handle,1);
-  if( res != 0 ) goto cleanup;
-  wprintf(L"Screen enabled\n");
+  if( res < 0 ) goto cleanup;
+  wprintf(L"Screen turned ON\n");
 
   // Send keep alive
   while(!kbhit())
   {
     res = rift_send_keep_alive(handle);
-    if( res < 0 ) goto cleanup;
-    msleep( 100 );
+    if( res < 0 ) break;
+    msleep( 1000 );
   }
 
   // Turn the CV1 screen off
   rift_send_enable_components(handle, 0);
+  if( res < 0 ) goto cleanup;
+  wprintf(L"Screen turned OFF\n");
 
 cleanup:
   // Close down connection

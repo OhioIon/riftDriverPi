@@ -21,8 +21,7 @@ Step 1 - Hardware connection
 Step 2 - Rebuilding the kernel with increased framerate support
 - The RPi kernel currently has a limitation of 85 Hz framerate for displays
 - The Oculus Rift CV1 requires exactly 90 Hz framerate
-- In order to get, patch and build the kernel execute the following commands in a terminal
-- This follows the instructions of https://www.raspberrypi.org/documentation/linux/kernel/building.md
+- In order to get and patch the kernel execute the following commands in a terminal
 
 ```shell
 sudo apt install git bc bison flex libssl-dev make
@@ -31,17 +30,9 @@ git clone --depth=1 https://github.com/raspberrypi/linux
 cd linux
 
 sed -i 's/if (drm_mode_vrefresh(mode) > 85)/if (drm_mode_vrefresh(mode) > 90)/g' drivers/gpu/drm/vc4/vc4_firmware_kms.c
-
-KERNEL=kernel7l
-make bcm2711_defconfig
-make -j4 zImage modules dtbs
-sudo make modules_install
-sudo cp arch/arm/boot/dts/*.dtb /boot/
-sudo cp arch/arm/boot/dts/overlays/*.dtb* /boot/overlays/
-sudo cp arch/arm/boot/dts/overlays/README /boot/overlays/
-sudo cp arch/arm/boot/zImage /boot/$KERNEL.img
-sudo reboot
 ```
+Follow the instructions of https://www.raspberrypi.org/documentation/linux/kernel/building.md to build and install the kernel
+
 Step 3 - Configure screen resolution manually via RPi config.txt
 - The Rift CV1 does not function like a normal screen
 - It will only send hotplug over HDMI if it is enabled via a USB driver (which is too late for RPi)

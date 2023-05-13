@@ -19,7 +19,7 @@ Step 1 - Hardware connection
 - Connect your normal screen to HDMI0
 - Connect the Oculus Rift CV1 to HDMI1 and USB 3.0 port of the RPi 4
 
-Step 2 - Rebuilding the kernel with increased framerate support
+Step 2 - Configure kernel with increased framerate support
 - The RPi kernel currently defaults to a limit of 85 Hz framerate for displays
 - The Oculus Rift CV1 requires exactly 90 Hz framerate
 - [As of Oct. 2020](https://github.com/raspberrypi/linux/issues/3677), the framerate limitation is configurable via a kernel parameter

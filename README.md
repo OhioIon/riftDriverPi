@@ -13,7 +13,7 @@ cd riftDriverPi
 make
 ```
 
-<b>How to make Raspbian recognize the Oculus Rift CV1 as screen</b>
+<b>How to make Raspberry Pi OS recognize the Oculus Rift CV1 as screen</b>
 
 Step 1 - Hardware connection
 - Connect your normal screen to HDMI0

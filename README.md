@@ -44,7 +44,15 @@ hdmi_timings:1=2160 1  8  32  40 1200 0  50 2 220 0 0 0 90 0 296750000 3
 ```
 
 Hint: Currently these settings only seem to work with the old fkms instead of the new default kms.
-Please change the line dtoverlay=vc4-kms-v3d to dtoverlay=vc4-<b>f</b>kms-v3d
+Please change the line 
+
+```shell
+dtoverlay=vc4-kms-v3d
+```
+to
+```shell
+dtoverlay=vc4-fkms-v3d
+```
 
 You can also use the config.txt provided as reference and copy it with:
 

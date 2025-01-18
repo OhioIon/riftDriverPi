@@ -27,7 +27,6 @@ int16_t rift_send_keep_alive( hid_device *handle )
   if( res_s16 < 0 )
   {
     // Error
-    wprintf(L"Sending keep alive failed with %d\n", res_s16);
     return res_s16;
   }
 
@@ -48,7 +47,6 @@ int16_t rift_send_enable_components( hid_device *handle, uint8_t on_u8 )
   if( res_s16 < 0 )
   {
     // Error
-    wprintf(L"Sending component enable failed with %d\n", res_s16);
     return res_s16;
   }
 

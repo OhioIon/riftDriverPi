@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+#include <sys/select.h>
 
 #include "hidapi.h"
 #include "rift.h"
@@ -12,6 +14,12 @@
 #define MAX_STR 255
 
 // ********************* Types          ********************* //
+typedef enum state_e
+{
+  state_Init_E = 0,  // Wait for Rift to be connected. Init once found.
+  state_KeepAlive_E, // Send keep alive messages
+  state_Cleanup_E,   // Cleanup and restart
+}state_te;
 
 // ********************* Data           ********************* //
 
@@ -58,64 +66,148 @@ int main(int argc, char* argv[])
   int res;
   wchar_t wstr[MAX_STR];
   hid_device *handle;
+  state_te state_e = state_Init_E;
 
-  wprintf(L"/// riftDriverPi V1.1 ///\n");
+  wprintf(L"/// riftDriverPi V2.0.0 ///\n");
+  
+  // Check if program is started with terminal attached
+  _Bool flgIsTerminal_l = isatty(STDIN_FILENO);
+  if( flgIsTerminal_l)
+  {
+    wprintf(L"Terminal mode enabled. Hit 'return' to exit.\n");
+  }
+  wprintf(L"Waiting for device ...\n");
 
   // Initialize hidapi library
   hid_init();
-
-  // Open device (Oculus Rift CV1)
-  handle = hid_open(0x2833, 0x0031, NULL);
-  if( handle == NULL )
+  
+  while(1)
   {
-    wprintf(L"hid_open() failed. Oculus Rift CV1 connected? udev rule setup?\n");
-    goto abort;
-  }
-
-  // Read the Manufacturer String
-  res = hid_get_manufacturer_string(handle, wstr, MAX_STR);
-  if( res < 0 ) goto cleanup;
-  wprintf(L"Manufacturer  : %S\n", wstr);
-
-  // Read the Product String
-  res = hid_get_product_string(handle, wstr, MAX_STR);
-  if( res < 0 ) goto cleanup;
-  wprintf(L"Product       : %S\n", wstr);
-
-  // Read the Serial Number String
-  res = hid_get_serial_number_string(handle, wstr, MAX_STR);
-  if( res < 0 ) goto cleanup;
-  wprintf(L"Serial Number : %S\n", wstr);
-
-  // Set non-blocking
-  res = hid_set_nonblocking(handle, 1);
-  if( res < 0 ) goto cleanup;
-  wprintf(L"Configured non-blocking transfer\n");
-
-  // Turn the CV1 screens on
-  res = rift_send_enable_components(handle,1);
-  if( res < 0 ) goto cleanup;
-  wprintf(L"Screen turned ON\n");
-
-  // Send keep alive
-  while(!kbhit())
-  {
-    res = rift_send_keep_alive(handle);
-    if( res < 0 ) break;
+    // Execute main loop once every second
     msleep( 1000 );
+    
+    // In terminal mode, exit on "return" keyboard hit
+    if( flgIsTerminal_l )
+    {
+      if( kbhit() )
+      {
+        // Disable screen immediately (not waiting for timeout of HMD)
+        if( (state_e == state_KeepAlive_E) && (handle != NULL) )
+        {
+          // Turn the CV1 screen off
+          rift_send_enable_components(handle, 0);
+          wprintf(L"Screen turned OFF\n");
+        }
+        
+        // Stop main loop
+        break;
+      }
+    }
+    
+    // Primary state machine
+    switch(state_e)
+    {
+      case state_Init_E: ///////////////////////////////////////////////
+      
+        // Open device (Oculus Rift CV1)
+        handle = hid_open(0x2833, 0x0031, NULL);
+        if( handle == NULL )
+        {
+          // Rift not found, abort init and try next time
+          continue;
+        }
+        else
+        {
+          wprintf(L"Device found!\n");
+        }
+        
+        // Read the Manufacturer String
+        res = hid_get_manufacturer_string(handle, wstr, MAX_STR);
+        if( res < 0 )
+        {
+          state_e = state_Cleanup_E;
+          continue;
+        }
+        wprintf(L"Manufacturer  : %S\n", wstr);
+        
+        // Read the Product String
+        res = hid_get_product_string(handle, wstr, MAX_STR);
+        if( res < 0 )
+        {
+          state_e = state_Cleanup_E;
+          continue;
+        }
+        wprintf(L"Product       : %S\n", wstr);
+
+        // Read the Serial Number String
+        res = hid_get_serial_number_string(handle, wstr, MAX_STR);
+        if( res < 0 )
+        {
+          state_e = state_Cleanup_E;
+          continue;
+        }
+        wprintf(L"Serial Number : %S\n", wstr);
+
+        // Set non-blocking
+        res = hid_set_nonblocking(handle, 1);
+        if( res < 0 )
+        {
+          state_e = state_Cleanup_E;
+          continue;
+        }
+        wprintf(L"Configured non-blocking transfer\n");
+        
+        // Turn the CV1 screens on
+        res = rift_send_enable_components(handle,1);
+        if( res < 0 )
+        {
+          state_e = state_Cleanup_E;
+          continue;
+        }
+        wprintf(L"Screen turned ON\n");
+        
+        // Init success, go to keep alive state
+        state_e = state_KeepAlive_E;
+        
+        break;
+        
+      case state_KeepAlive_E: //////////////////////////////////////////
+      
+        // Send keep alive message to keep the screen running
+        res = rift_send_keep_alive(handle);
+        if( res < 0 )
+        {
+          state_e = state_Cleanup_E;
+          continue;
+        }
+      
+        break;
+        
+      case state_Cleanup_E: ////////////////////////////////////////////
+        
+        // Close down connection
+        hid_close(handle);
+        handle = NULL;
+        
+        wprintf(L"Connection lost. Waiting for device ...\n");
+        
+        // Go back to init
+        state_e = state_Init_E;
+        
+      default:
+        // Should not happen
+        state_e = state_Init_E;
+        break;
+    }
   }
-
-  // Turn the CV1 screen off
-  rift_send_enable_components(handle, 0);
-  if( res < 0 ) goto cleanup;
-  wprintf(L"Screen turned OFF\n");
-
-cleanup:
-  // Close down connection
-  hid_close(handle);
+  
+  // Close down connection (if any)
+  if( handle != NULL )
+  {
+    hid_close(handle);
+  }
 
   // Finalize the hidapi library
-abort:
   hid_exit();
 
   wprintf(L"/// Exit ///\n");
